@@ -1,5 +1,7 @@
 import pygame  # Biblioteca para criar o jogo
 import random  # Biblioteca para gerar aleatoriamente
+import threading  # Biblioteca para criar threads
+import time # Biblioteca para controlar o tempo
 
 # Inicialização do Pygame
 pygame.init()
@@ -69,6 +71,7 @@ posicao_tiro_x = 105
 
 # Velocidade dos personagens
 velocidade_tiro = 0
+velocidade_inimigo = 2
 
 # ======================================================================
 
@@ -168,6 +171,19 @@ def pause_game():
                 if evento.key == pygame.K_ESCAPE:
                     return True
 
+# Thread para aumentar a velocidade dos inimigos
+def aumentar_velocidade_inimigos():
+    global velocidade_inimigo
+    while True:
+        time.sleep(10)  # Aumenta a velocidade a cada 10 segundos
+        velocidade_inimigo += 1
+
+# ======================================================================
+
+# Iniciar a thread para aumentar a velocidade dos inimigos
+    thread_velocidade_inimigos = threading.Thread(target=aumentar_velocidade_inimigos)
+    thread_velocidade_inimigos.start()    
+    
 # ======================================================================
 
 start_game()
@@ -181,6 +197,7 @@ while loop:
         elif events.type == pygame.KEYDOWN:
                 if events.key == pygame.K_ESCAPE:
                     pause_game()
+        # Acabar ou reiniciar o jogo            
         if vida == 0:
             if not game_over():
                 loop = False
@@ -211,7 +228,7 @@ while loop:
 
     # Movimento dos bonecos
     x -= 1  # Movimento do fundo
-    posicao_inimigo_x -= 2  # Movimento do inimigo
+    posicao_inimigo_x -= velocidade_inimigo  # Movimento do inimigo
     posicao_tiro_x += velocidade_tiro  # Movimento do tiro
 
 # ======================================================================
@@ -235,6 +252,7 @@ while loop:
         posicao_aliado_x += 1.5
         if not atirar:
             posicao_tiro_x += 1.5
+
     # teclas do jogador andar nas setinhas
     if tecla[pygame.K_UP] and posicao_aliado_y > 1:  # andar para cima
         posicao_aliado_y -= 1.5
